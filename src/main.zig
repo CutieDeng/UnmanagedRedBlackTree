@@ -15,6 +15,41 @@ pub usingnamespace rbt;
 
 pub const I64Tree = rbt.RedBlackTree(i64, std.math.order); 
 
+pub fn check(t: I64Tree) bool {
+    if (t.root == null) {
+        return true; 
+    } 
+    return check_node(t.root.?, t, null, null); 
+}
+
+pub fn check_node(n: anytype, t: I64Tree, alpha: ?i64, beta: ?i64) bool {
+    if (alpha) |a| {
+        const p = I64Tree.compare(n.key, a); 
+        if (p != .gt) {
+            std.debug.print("\x1b[32;m node: {}, alpha: {}\n\x1b[0m", .{ n.key, a }); 
+            return false; 
+        } 
+    }
+    if (beta) |b| {
+        const p = I64Tree.compare(n.key, b); 
+        if (p != .lt) {
+            std.debug.print("\x1b[32;m node: {}, beta: {}\n\x1b[0m", .{ n.key, b }); 
+            return false; 
+        } 
+    }
+    if (n.children[0]) |l| {
+        if (check_node(l, t, alpha, n.key) == false) {
+            return false; 
+        } 
+    }
+    if (n.children[1]) |r| {
+        if (check_node(r, t, n.key, beta) == false) {
+            return false; 
+        } 
+    }
+    return true;
+}
+
 pub fn display(t: I64Tree) void {
     var root = t.root;  
     if (root) |r| {
@@ -53,6 +88,8 @@ pub fn calculate_height(n: anytype) usize {
 }
 
 pub fn main() !void {
+    if (true) 
+        return _main2(); 
     var gpa = std.heap.GeneralPurposeAllocator(.{}){}; 
     const alloca = gpa.allocator(); 
     var t: I64Tree = .{}; 
@@ -88,7 +125,7 @@ pub fn main() !void {
             break; 
         }
     } 
-    t.peek(t.root.?, 0);
+    // t.peek(t.root.?, 0);
     const h = calculate_height(t.root.?); 
     std.debug.print("height: {}\n", .{h}); 
     index = 10; 
@@ -140,22 +177,30 @@ pub fn _main2() !void {
         errdefer alloca.destroy(node); 
         try list.append(node); 
         entry.set(node); 
-        // std.debug.print("insert successfully\n", .{});
         if (list.items.len > 1000000) {
             break; 
         }
     } 
-    display(t); 
     const h = calculate_height(t.root.?); 
     std.debug.print("height: {}\n", .{h}); 
     index = 10; 
     while (true) {
         var val: i64 = index; 
         index += 1; 
-        std.debug.print("Attempt to rm {}\n", .{ val }); 
+        if (@rem(index, 10000) == 0){
+            I64Tree.check(t.root.?);
+            std.debug.print("\x1b[33;1mIndex = {}\x1b[0m\n", .{ index });
+        }
         var entry = t.getEntryFor(val); 
+        if (entry.node == null)
+            break; 
         entry.set(null); 
+        // if (!check(t)) {
+        //     display(t); 
+        //     std.debug.print("Failed to remove {}\n", .{ val }); 
+        //     t.peek(t.root.?, 0);
+        //     break; 
+        // }
     }
-    std.debug.print("Attempt to remove all! \n", .{} );
     display(t); 
 }

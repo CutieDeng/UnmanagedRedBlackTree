@@ -5,7 +5,7 @@ pub fn RedBlackTree(comptime Key: type, comptime compareFn: anytype) type {
         const Self = @This(); 
         const Order = std.math.Order; 
         const assert = std.debug.assert; 
-        fn compare(a: Key, b: Key) Order {
+        pub fn compare(a: Key, b: Key) Order {
             return compareFn(a, b); 
         }
         root: ?*Node = null, 
@@ -370,7 +370,7 @@ pub fn RedBlackTree(comptime Key: type, comptime compareFn: anytype) type {
         }
         fn findSubDirection(self: Self, node: *Node, comptime idx: usize) *Node {
             if (node.children[idx]) |child| {
-                return self.findSubMin(child); 
+                return self.findSubDirection(child, idx); 
             } else {
                 return node; 
             } 
@@ -534,6 +534,14 @@ pub fn RedBlackTree(comptime Key: type, comptime compareFn: anytype) type {
                 .node = node,
                 .context = .{ .inserted_under = parent },
             };
+        }
+        pub fn getEntryForExisting(self: *Self, node: *Node) Entry {
+            return Entry {
+                .key = node.key, 
+                .tree = self, 
+                .node = node, 
+                .context = .{ .inserted_under = node.parent }, 
+            }; 
         }
     };
 }
