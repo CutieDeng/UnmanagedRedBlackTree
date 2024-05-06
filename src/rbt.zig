@@ -432,14 +432,6 @@ pub fn RedBlackTree(comptime Key: type, comptime compareFn: anytype) type {
             node.* = .{ .key = key, .red = false, .parent = parent, .children = .{ null, null } }; 
             return self.insertNode(node); 
         }
-        pub fn check(node: *Node) void {
-            for (node.children) |c| {
-                if (c) |c2| {
-                    assert(c2 != node); 
-                    assert(c2.parent == node); 
-                }
-            }
-        }
         fn rotate(self: *Self, node: *Node, comptime left: bool) void { 
             const parent = node.parent; 
             const link = if (parent) |p| &p.children[@intFromBool(p.children[1] == node)] else &self.root; 

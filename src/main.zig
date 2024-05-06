@@ -1,5 +1,6 @@
 const std = @import("std");
 const testing = std.testing;
+const rbt_helper = @import("helper.zig"); 
 
 export fn add(a: i32, b: i32) i32 {
     return a + b;
@@ -51,8 +52,7 @@ pub fn check_node(n: anytype, t: I64Tree, alpha: ?i64, beta: ?i64) bool {
 }
 
 pub fn display(t: I64Tree) void {
-    var root = t.root;  
-    if (root) |r| {
+    if (t.root) |r| {
         display_node(r); 
     } else {
         std.debug.print("empty", .{}); 
@@ -61,14 +61,14 @@ pub fn display(t: I64Tree) void {
 }
 
 pub fn display_node(n: anytype) void {
-    I64Tree.check(n); 
+    rbt_helper.check(n); 
     if (n.children[0]) |l| {
-        I64Tree.check(l); 
+        rbt_helper.check(l); 
         display_node(l); 
     } 
     std.debug.print("{} ", .{n.key}); 
     if (n.children[1]) |r| {
-        I64Tree.check(r); 
+        rbt_helper.check(r); 
         display_node(r); 
     } 
     return ; 
@@ -78,7 +78,7 @@ pub fn calculate_height(n: anytype) usize {
     var maximize : usize = 0; 
     inline for (n.children) |d| {
         if (d) |d2| {
-            var h = calculate_height(d2); 
+            const h = calculate_height(d2); 
             if (h > maximize) {
                 maximize = h;  
             }
@@ -102,14 +102,16 @@ pub fn main() !void {
     }
     var stdin = std.io.getStdIn();
     var reader = stdin.reader();
-    _ = reader;
+    _ = &reader;
     var buffer : []u8 = try alloca.alloc(u8, 1024); 
     var rand = std.rand.DefaultPrng.init(3);
-    _ = rand; 
+    _ = &buffer; 
+    _ = &rand; 
     defer alloca.free(buffer);   
     var index : i64 = 0; 
     while (true) {
         var val: i64 = index; 
+        _ = &val; 
         index += 1; 
         // val = @bitCast(rand.next()); 
         var entry = t.getEntryFor(val); 
@@ -131,6 +133,7 @@ pub fn main() !void {
     index = 10; 
     while (true) {
         var val: i64 = index; 
+        _ = &val; 
         index += 1; 
         // val = t.getMax().?.key; 
         var entry = t.getEntryFor(val); 
@@ -158,14 +161,16 @@ pub fn _main2() !void {
     }
     var stdin = std.io.getStdIn();
     var reader = stdin.reader();
-    _ = reader;
+    _ = &reader;
     var buffer : []u8 = try alloca.alloc(u8, 1024); 
     var rand = std.rand.DefaultPrng.init(23);
-    _ = rand; 
+    _ = &rand; 
+    _ = &buffer; 
     defer alloca.free(buffer);   
     var index : i64 = 0; 
     while (true) {
         var val: i64 = index; 
+        _ = &val; 
         index += 1; 
         // val = @bitCast(rand.next()); 
         var entry = t.getEntryFor(val); 
@@ -186,9 +191,10 @@ pub fn _main2() !void {
     index = 10; 
     while (true) {
         var val: i64 = index; 
+        _ = &val; 
         index += 1; 
         if (@rem(index, 10000) == 0){
-            I64Tree.check(t.root.?);
+            rbt_helper.check(t.root.?); 
             std.debug.print("\x1b[33;1mIndex = {}\x1b[0m\n", .{ index });
         }
         var entry = t.getEntryFor(val); 
